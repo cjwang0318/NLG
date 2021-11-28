@@ -69,6 +69,12 @@ def remove_unknown_word(sentence):
     sentence = sentence.translate(str.maketrans('', '', unknow_list))
     return sentence
 
+def remove_chars_in_sentence(charList,sentence):
+    #charList = "[."
+    #sentence = sentence.replace("，", ",")
+    sentence = sentence.translate(str.maketrans('', '', charList))
+    return sentence
+
 
 # List Operation
 def remove_items_in_list(test_list, item):
