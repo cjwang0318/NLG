@@ -7,7 +7,8 @@ import tool_box
 
 if __name__ == '__main__':
     dataPath = "./Amazon/data/"
-    readFile = "meta_Arts_Crafts_and_Sewing.json.gz"
+    readFile = "meta_Gift_Cards.json.gz"
+    #readFile = "meta_Arts_Crafts_and_Sewing.json.gz"
     writeFile = "results.json"
     data = []
     with gzip.open(dataPath + readFile) as f:
@@ -42,6 +43,9 @@ if __name__ == '__main__':
             line = str(df.at[i, "description"])
 
             if "</" in line or "[]" in line:
+                if i == len(df) - 1:  # 刪除最後2個位元", "
+                    print("Do last character operation...")
+                    tool_box.Remove_Enlglish_Character_In_File(dataPath, -2)
                 continue
             else:
                 line = line.replace("<br>", "")
@@ -55,6 +59,7 @@ if __name__ == '__main__':
                     f.write("\"" + line + "\", ")
                 else:
                     f.write("\"" + line + "\"")
+
         f.write("]")
     reservationRate = round(count / totalNum, 4)
     print("Reservation Rate=" + str(reservationRate) + "(" + str(count) + "/" + str(totalNum) + ")")

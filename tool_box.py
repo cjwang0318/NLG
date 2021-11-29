@@ -17,6 +17,11 @@ def write_file(path, write_data):
         writer.writelines(write_data)
 
 
+def append_file(path, write_data):
+    with open(path, 'a', encoding='utf-8') as writer:
+        writer.writelines(write_data)
+
+
 def mkdir(path):
     if not os.path.isdir(path):
         os.mkdir(path)
@@ -30,7 +35,13 @@ def replace_punctuation(str):
     return str
 
 
-# Chinese Opertion
+def Remove_Enlglish_Character_In_File(fileName, position):
+    with open(fileName, 'rb+') as filehandle:
+        filehandle.seek(position, os.SEEK_END)
+        filehandle.truncate()
+
+
+# Chinese Operation
 def remove_chinese_punctuation(line, strip_all=True):
     # 漢字的範圍為”\u4e00-\u9fa5“，這個是用Unicode表示的，所以前面必須要加”u“
     # 字元”r“的意思是表示忽略後面的轉義字元，這樣簡化了後面正則表示式裡每遇到一個轉義字元還得挨個轉義的麻煩
@@ -69,9 +80,10 @@ def remove_unknown_word(sentence):
     sentence = sentence.translate(str.maketrans('', '', unknow_list))
     return sentence
 
-def remove_chars_in_sentence(charList,sentence):
-    #charList = "[."
-    #sentence = sentence.replace("，", ",")
+
+def remove_chars_in_sentence(charList, sentence):
+    # charList = "[."
+    # sentence = sentence.replace("，", ",")
     sentence = sentence.translate(str.maketrans('', '', charList))
     return sentence
 
@@ -91,9 +103,16 @@ def check_item_in_list(str, list):
             result = target
     return result
 
+
 # test area
 # a="Type-(I) 2.48"
 # print(replace_punctuation(a))
 
 # str=remove_unknown_word("、CD3、")
 # print(str)
+
+
+# if __name__ == '__main__':
+#     dataPath = "./Amazon/data/results.json"
+#     Remove_Enlglish_Character_In_File(dataPath, -3)
+#     append_file(dataPath, "]")
