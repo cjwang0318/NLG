@@ -76,11 +76,14 @@ def getResult(keyword, nsamples):
     keyword=convert_s2c(keyword)
     # transform to json format
     ans = {"keyword": keyword, "nsamples": nsamples}
+    sampleList=[]
     for id, sample in enumerate(result):
         # print(id)
-        sampleID = "sample_" + str(id)
-        ans[sampleID] = sample
+        #sampleID = "sample_" + str(id)
+        #ans[sampleID] = sample
+        sampleList.append(sample)
     # print(ans)
+    ans["samples"] = sampleList
     return ans
 
 
@@ -98,5 +101,6 @@ if __name__ == '__main__':
     # result = chinese_post_processing(data, chinese_search_template)
     # tool_box.write_file(writeFile, result)
 
-    getResult("aaa", 5)
+    ans=getResult("aaa", 5)
+    print(ans)
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
