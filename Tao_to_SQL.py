@@ -4,16 +4,17 @@ import tool_box
 if __name__ == '__main__':
     dataPath = "./Tao/data/"
     readFile = "content_tag_dataset.txt"
-    #readFile = "test.txt"
+    # readFile = "test.txt"
     writeFile = "results.txt"
     top_n_tags = 5
     lines = tool_box.read_file(dataPath + readFile, 0)
     resultList = []
     lineCount = 1
+    checkedLineNum = 0
     for line in lines:
-        print(repr(lineCount)+":"+line)
+        print(repr(lineCount) + ":" + line)
         elements = line.split("\t")
-        if len(elements) !=2:
+        if len(elements) != 2 or lineCount < checkedLineNum:
             lineCount = lineCount + 1
             continue
         description = elements[0]
