@@ -7,8 +7,8 @@ import tool_box
 
 if __name__ == '__main__':
     dataPath = "./Amazon/data/"
-    readFile = "meta_Gift_Cards.json.gz"
-    #readFile = "meta_Arts_Crafts_and_Sewing.json.gz"
+    #readFile = "meta_Gift_Cards.json.gz"
+    readFile = "meta_Arts_Crafts_and_Sewing.json.gz"
     writeFile = "results.json"
     data = []
     with gzip.open(dataPath + readFile) as f:

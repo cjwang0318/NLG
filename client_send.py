@@ -14,7 +14,7 @@ sendMessage_json = {
 start = time.time()
 # sent json to server
 #res = requests.post('http://192.168.0.3:5000/getResult', json=sendMessage_json)
-res = requests.post('http://192.168.100.122:5000/getResult', json=sendMessage_json)
+res = requests.post('http://192.168.100.77:5000/getResult', json=sendMessage_json)
 if res.ok:
     outputs = res.json()
     print(outputs)
