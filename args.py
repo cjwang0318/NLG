@@ -1,0 +1,17 @@
+device = '0'  # '生成设备'
+length = 50  # '生成长度'
+batch_size = 1  # '生成的batch size'
+nsamples = 10  # '生成几个样本'
+temperature = 1  # '生成温度'
+topk = 8  # '最高几选一'
+topp = 0  # '最高积累概率'
+model_config = 'config/model_config_small.json'  # '模型参数'
+tokenizer_path = 'cache/vocab_small.txt'  # '词表路径'
+model_path = 'model/final_model'  # '模型路径'
+# prefix = "keyword"  # '生成文章的开头'
+no_wordpiece = False  # '不做word piece切词'
+segment = False  # '中文以词为单位'
+fast_pattern = True  # '采用更加快的方式生成文本'
+save_samples = True  # '保存产生的样本'
+save_samples_path = './output'  # "保存样本的路径"
+repetition_penalty = 1.0
