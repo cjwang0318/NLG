@@ -125,11 +125,11 @@ def generate(n_ctx, model, context, length, tokenizer, temperature=1, top_k=0, t
                                repitition_penalty=repitition_penalty, device=device)
 
 
-def generator_rest(prefix, model):
-    if args.segment:
-        from tokenizations import tokenization_bert_word_level as tokenization_bert
-    else:
-        from tokenizations import tokenization_bert
+def generator_rest(prefix, model, tokenizer):
+    # if args.segment:
+    #     from tokenizations import tokenization_bert_word_level as tokenization_bert
+    # else:
+    #     from tokenizations import tokenization_bert
 
     os.environ["CUDA_VISIBLE_DEVICES"] = args.device  # 此处设置程序使用哪些显卡
     length = args.length
@@ -142,7 +142,7 @@ def generator_rest(prefix, model):
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
-    tokenizer = tokenization_bert.BertTokenizer(vocab_file=args.tokenizer_path)
+    #tokenizer = tokenization_bert.BertTokenizer(vocab_file=args.tokenizer_path)
     #model = GPT2LMHeadModel.from_pretrained(args.model_path)
     model.to(device)
     model.eval()
