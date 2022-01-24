@@ -66,7 +66,12 @@ def chinese_post_processing_to_api(dataList, chinese_search_template):
 
 
 def remove_keyword(keyword, str):
-    str_without_keyword = str.replace(keyword + "，", "")
+    if keyword + "，" in str:
+        str_without_keyword = str.replace(keyword + "，", "")
+    elif keyword + "。" in str:
+        str_without_keyword = str.replace(keyword + "。", "")
+    else:
+        str_without_keyword = str
     return str_without_keyword
 
 
