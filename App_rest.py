@@ -1,4 +1,5 @@
 #conda install flask
+#必需搭配 App_rest.py(Rest服務執行檔), generate_rest.py(文案生成), args.py(參數設定檔)
 from flask import Flask, request
 from flask import url_for
 from opencc import OpenCC
@@ -20,8 +21,13 @@ class web_server:
         # self.app.add_url_rule('/image/query', view_func=self.queryImg, methods=['GET'])
 
         # init core
-        # self.Address_inference = address_inference()
+        if args.segment:
+            from tokenizations import tokenization_bert_word_level as tokenization_bert
+        else:
+            from tokenizations import tokenization_bert
+        self.tokenizer = tokenization_bert.BertTokenizer(vocab_file=args.tokenizer_path)
         self.model = GPT2LMHeadModel.from_pretrained(args.model_path)
+
         # record status
         self.status = "free"
         self.failCode = ['1', '2', '3', '4', '5']
@@ -52,7 +58,7 @@ class web_server:
         #cmd = 'python ./generate.py --device=0 --length=30 --temperature=0.3 --topk=20 --nsamples='+str(nsamples)+' --prefix='+str(keyword)+' --fast_pattern --save_samples --save_samples_path=./output'
         #print(cmd)
         #os.system(cmd)
-        gs.generator_rest(keyword, self.model)
+        gs.generator_rest(keyword, self.model, self.tokenizer)
         # call postProcessing
         answer=PostProcessing.getResult(keyword, nsamples)
 

@@ -65,6 +65,16 @@ def chinese_post_processing_to_api(dataList, chinese_search_template):
     return result
 
 
+def remove_keyword(keyword, str):
+    if keyword + "，" in str:
+        str_without_keyword = str.replace(keyword + "，", "")
+    elif keyword + "。" in str:
+        str_without_keyword = str.replace(keyword + "。", "")
+    else:
+        str_without_keyword = str
+    return str_without_keyword
+
+
 def getResult(keyword, nsamples):
     chinese_search_template = '，。！'
     dataPath = "./output/"
@@ -73,14 +83,15 @@ def getResult(keyword, nsamples):
     result = chinese_post_processing_to_api(data, chinese_search_template)
     # print(result)
 
-    keyword=convert_s2c(keyword)
+    keyword = convert_s2c(keyword)
     # transform to json format
     ans = {"keyword": keyword, "nsamples": nsamples}
-    sampleList=[]
+    sampleList = []
     for id, sample in enumerate(result):
         # print(id)
-        #sampleID = "sample_" + str(id)
-        #ans[sampleID] = sample
+        # sampleID = "sample_" + str(id)
+        # ans[sampleID] = sample
+        sample = remove_keyword(keyword, sample)  # remove prefix in the return sentence
         sampleList.append(sample)
     # print(ans)
     ans["samples"] = sampleList
@@ -101,6 +112,6 @@ if __name__ == '__main__':
     # result = chinese_post_processing(data, chinese_search_template)
     # tool_box.write_file(writeFile, result)
 
-    ans=getResult("aaa", 5)
+    ans = getResult("aaa", 5)
     print(ans)
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
