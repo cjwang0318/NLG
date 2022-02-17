@@ -75,6 +75,20 @@ def remove_keyword(keyword, str):
     return str_without_keyword
 
 
+def remove_last_sentence(str):
+    strList = str.split("。")
+    num_of_sentence = len(strList)
+    if (num_of_sentence != 2):
+        i = 0
+        str_without_last_sentence=""
+        while i < num_of_sentence-2:
+            str_without_last_sentence = str_without_last_sentence + strList[i]+"。"
+            i=i+1
+    else:
+        str_without_last_sentence = str
+    return str_without_last_sentence
+
+
 def getResult(keyword, nsamples):
     chinese_search_template = '，。！'
     dataPath = "./output/"
@@ -103,15 +117,16 @@ if __name__ == '__main__':
     dataPath = "./output/"
     readFile = "samples.txt"
     writeFile = "results.txt"
-    data = tool_box.read_file(dataPath + readFile, 0)
-    # to_convert = '天空是有些阴霾的。但在阳光明媚时，你是能看到阳光的。我在这个地方看见过阳光。阳光'
+   # data = tool_box.read_file(dataPath + readFile, 0)
+    str1 = '天空是有些阴霾的。但在阳光明媚时，你是能看到阳光的，我在这个地方看见过阳光，阳光。'
+    str2 = '一口下去，香味四溢，讓人回味無窮。這款來自意大利的進口油炸鍋，採用食品級鋁合金材質製作。'
     # convertedStr = convert_s2c(to_convert)
     # print(convertedStr)
     # aa=[to_convert]
 
     # result = chinese_post_processing(data, chinese_search_template)
     # tool_box.write_file(writeFile, result)
-
-    ans = getResult("aaa", 5)
+    #ans = getResult("aaa", 5)
+    ans=remove_last_sentence(str2)
     print(ans)
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
