@@ -80,10 +80,10 @@ def remove_last_sentence(str):
     num_of_sentence = len(strList)
     if (num_of_sentence != 2):
         i = 0
-        str_without_last_sentence=""
-        while i < num_of_sentence-2:
-            str_without_last_sentence = str_without_last_sentence + strList[i]+"。"
-            i=i+1
+        str_without_last_sentence = ""
+        while i < num_of_sentence - 2:
+            str_without_last_sentence = str_without_last_sentence + strList[i] + "。"
+            i = i + 1
     else:
         str_without_last_sentence = str
     return str_without_last_sentence
@@ -106,6 +106,7 @@ def getResult(keyword, nsamples):
         # sampleID = "sample_" + str(id)
         # ans[sampleID] = sample
         sample = remove_keyword(keyword, sample)  # remove prefix in the return sentence
+        sample = remove_last_sentence(sample)  # remove last sentence
         sampleList.append(sample)
     # print(ans)
     ans["samples"] = sampleList
@@ -117,7 +118,7 @@ if __name__ == '__main__':
     dataPath = "./output/"
     readFile = "samples.txt"
     writeFile = "results.txt"
-   # data = tool_box.read_file(dataPath + readFile, 0)
+    # data = tool_box.read_file(dataPath + readFile, 0)
     str1 = '天空是有些阴霾的。但在阳光明媚时，你是能看到阳光的，我在这个地方看见过阳光，阳光。'
     str2 = '一口下去，香味四溢，讓人回味無窮。這款來自意大利的進口油炸鍋，採用食品級鋁合金材質製作。'
     # convertedStr = convert_s2c(to_convert)
@@ -126,7 +127,7 @@ if __name__ == '__main__':
 
     # result = chinese_post_processing(data, chinese_search_template)
     # tool_box.write_file(writeFile, result)
-    #ans = getResult("aaa", 5)
-    ans=remove_last_sentence(str2)
+    ans = getResult("aaa", 5)
+    #ans = remove_last_sentence(str2)
     print(ans)
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
