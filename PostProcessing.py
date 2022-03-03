@@ -3,6 +3,7 @@
 from opencc import OpenCC
 import tool_box
 import re
+from datetime import datetime
 
 
 def convert_s2c(str):
@@ -89,10 +90,35 @@ def remove_last_sentence(str):
     return str_without_last_sentence
 
 
+def remove_duplicated_sub_sentence(str):
+    stnList = str.split("。")
+    no_duplicated_sentence = ""
+    for sentence in stnList:
+        if (sentence == ""):
+            continue
+        if ("，" not in sentence):
+            no_duplicated_sentence = no_duplicated_sentence + sentence + "。"
+            continue
+        strList = sentence.split("，")
+        num_sub_strList = len(strList)
+        for i, element in enumerate(strList):
+            if (i < num_sub_strList - 1):
+                check_str = strList[i + 1]
+            else:
+                no_duplicated_sentence = no_duplicated_sentence + element + "。"
+                continue
+            if (element == check_str):
+                continue
+            else:
+                no_duplicated_sentence = no_duplicated_sentence + element + "，"
+    return no_duplicated_sentence
+
+
 def getResult(keyword, nsamples):
     chinese_search_template = '，。！'
     dataPath = "./output/"
     readFile = "samples.txt"
+    logFile = "log.txt"
     data = tool_box.read_file(dataPath + readFile, 0)
     result = chinese_post_processing_to_api(data, chinese_search_template)
     # print(result)
@@ -101,14 +127,19 @@ def getResult(keyword, nsamples):
     # transform to json format
     ans = {"keyword": keyword, "nsamples": nsamples}
     sampleList = []
+    logList = []
+    time = datetime.now().strftime("%Y-%m-%d %H:%M:%S %p")
     for id, sample in enumerate(result):
         # print(id)
         # sampleID = "sample_" + str(id)
         # ans[sampleID] = sample
         sample = remove_keyword(keyword, sample)  # remove prefix in the return sentence
         sample = remove_last_sentence(sample)  # remove last sentence
+        sample = remove_duplicated_sub_sentence(sample)  # remove same words in a sentence
         sampleList.append(sample)
+        logList.append(time + ", " + keyword + ", " + sample + "\n")
     # print(ans)
+    tool_box.append_file(logFile, logList)
     ans["samples"] = sampleList
     return ans
 
@@ -119,8 +150,8 @@ if __name__ == '__main__':
     readFile = "samples.txt"
     writeFile = "results.txt"
     # data = tool_box.read_file(dataPath + readFile, 0)
-    str1 = '天空是有些阴霾的。但在阳光明媚时，你是能看到阳光的，我在这个地方看见过阳光，阳光。'
-    str2 = '一口下去，香味四溢，讓人回味無窮。這款來自意大利的進口油炸鍋，採用食品級鋁合金材質製作。'
+    str1 = '天空是有些阴霾的。但在阳光明媚时，你是能看到阳光的，我在这个地方看见过阳光，阳光，阳光，阳光。'
+    str2 = '一口下去，香味四溢，香味四溢，讓人回味無窮，讓人回味無窮。這款來自意大利的進口油炸鍋，採用食品級鋁合金材質製作。'
     # convertedStr = convert_s2c(to_convert)
     # print(convertedStr)
     # aa=[to_convert]
@@ -128,6 +159,9 @@ if __name__ == '__main__':
     # result = chinese_post_processing(data, chinese_search_template)
     # tool_box.write_file(writeFile, result)
     ans = getResult("aaa", 5)
-    #ans = remove_last_sentence(str2)
-    print(ans)
+    # ans = remove_last_sentence(str2)
+    # ans = remove_duplicated_sub_sentence(str2)
+    # print(ans)
+    result = datetime.now().strftime("%Y-%m-%d %H:%M:%S %p")
+    print(result)
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
