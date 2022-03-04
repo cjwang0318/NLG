@@ -129,6 +129,7 @@ def getResult(keyword, nsamples):
     sampleList = []
     logList = []
     time = datetime.now().strftime("%Y-%m-%d %H:%M:%S %p")
+    logList.append("----- " + time + " -----\n")
     for id, sample in enumerate(result):
         # print(id)
         # sampleID = "sample_" + str(id)
@@ -137,8 +138,7 @@ def getResult(keyword, nsamples):
         sample = remove_last_sentence(sample)  # remove last sentence
         sample = remove_duplicated_sub_sentence(sample)  # remove same words in a sentence
         sampleList.append(sample)
-        logList.append(time + ", " + keyword + ", " + sample + "\n")
-    # print(ans)
+        logList.append(keyword + ", " + sample + "\n")
     tool_box.append_file(logFile, logList)
     ans["samples"] = sampleList
     return ans
@@ -152,6 +152,7 @@ if __name__ == '__main__':
     # data = tool_box.read_file(dataPath + readFile, 0)
     str1 = '天空是有些阴霾的。但在阳光明媚时，你是能看到阳光的，我在这个地方看见过阳光，阳光，阳光，阳光。'
     str2 = '一口下去，香味四溢，香味四溢，讓人回味無窮，讓人回味無窮。這款來自意大利的進口油炸鍋，採用食品級鋁合金材質製作。'
+    str3 = '就像是女性的高跟鞋，穿上一双高跟鞋，就像是女性的高跟鞋，穿上一双高跟鞋，就像是女性的高跟鞋。'
     # convertedStr = convert_s2c(to_convert)
     # print(convertedStr)
     # aa=[to_convert]
@@ -159,9 +160,9 @@ if __name__ == '__main__':
     # result = chinese_post_processing(data, chinese_search_template)
     # tool_box.write_file(writeFile, result)
     ans = getResult("aaa", 5)
-    # ans = remove_last_sentence(str2)
-    # ans = remove_duplicated_sub_sentence(str2)
+    #ans = remove_last_sentence(str3)
+    #ans = remove_duplicated_sub_sentence(str3)
     # print(ans)
     result = datetime.now().strftime("%Y-%m-%d %H:%M:%S %p")
-    print(result)
+    print(ans)
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
