@@ -1,23 +1,31 @@
 # conda install requests
 import requests
 import time
-from opencc import OpenCC
+import args
+import json
 
-keyword = "鹹蛋黃白豆沙芝麻"
-nsamples = 8
 
-sendMessage_json = {
-    "keyword": keyword,
-    "nsamples": nsamples
-}
+def call_CKIP(query):
+    sendMessage_query = {
+        "sentences": [query],
+        "dictionary": args.dictionary
+    }
+    sendMessage_json = json.dumps(sendMessage_query)
+    start = time.time()
+    # sent json to server
+    res = requests.post('http://' + args.segmentation_server_IP + '/getResult', json=sendMessage_json)
+    seg_query = ""
+    if res.ok:
+        outputs = res.json()
+        print(outputs)
+        for word in outputs[0]:
+            seg_query = seg_query + " " + word
+    seg_query = seg_query.strip()
+    print(seg_query)
+    end = time.time()
+    print('time: ', end - start)
 
-start = time.time()
-# sent json to server
-#res = requests.post('http://192.168.0.3:5000/getResult', json=sendMessage_json)
-res = requests.post('http://192.168.50.32:5000/getResult', json=sendMessage_json)
-if res.ok:
-    outputs = res.json()
-    print(outputs)
 
-end = time.time()
-print('time: ', end - start)
+if __name__ == '__main__':
+    keyword = "妮維雅q10plus美體緊膚乳液400ml"
+    call_CKIP(keyword)

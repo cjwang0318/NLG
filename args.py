@@ -15,3 +15,5 @@ fast_pattern = True  # '采用更加快的方式生成文本'
 save_samples = True  # '保存产生的样本'
 save_samples_path = './output'  # "保存样本的路径"
 repetition_penalty = 1.0
+segmentation_server_IP="192.168.50.29:6000"
+dictionary="None"
