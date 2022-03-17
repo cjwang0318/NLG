@@ -23,10 +23,12 @@ def call_CKIP(query):
     seg_query = seg_query.strip()
     #print(seg_query)
     end = time.time()
-    print('time: ', end - start)
+    #print('time: ', end - start)
     return seg_query
 
 
+
 if __name__ == '__main__':
-    keyword = "時尚風公主裙"
-    call_CKIP(keyword)
+    keyword = "時尚風西裝"
+    seg_query=call_CKIP(keyword)
+    print(seg_query)

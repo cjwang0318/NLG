@@ -114,7 +114,7 @@ def remove_duplicated_sub_sentence(str):
     return no_duplicated_sentence
 
 
-def getResult(keyword, nsamples):
+def getResult(keyword, seg_keywords, seg_keyword_without_oov, nsamples):
     chinese_search_template = '，。！'
     dataPath = "./output/"
     readFile = "samples.txt"
@@ -123,22 +123,25 @@ def getResult(keyword, nsamples):
     result = chinese_post_processing_to_api(data, chinese_search_template)
     # print(result)
 
-    keyword = convert_s2c(keyword)
+    seg_keyword_without_oov = convert_s2c(seg_keyword_without_oov)
     # transform to json format
-    ans = {"keyword": keyword, "nsamples": nsamples}
+    ans = {"keyword": seg_keyword_without_oov, "nsamples": nsamples}
     sampleList = []
     logList = []
     time = datetime.now().strftime("%Y-%m-%d %H:%M:%S %p")
     logList.append("----- " + time + " -----\n")
+    logList.append("原始關鍵字：" + keyword + "\n")
+    logList.append("CKIP斷詞關鍵字：" + seg_keywords + "\n")
+    logList.append("進入生成系統關鍵字：" + seg_keyword_without_oov + "\n")
     for id, sample in enumerate(result):
         # print(id)
         # sampleID = "sample_" + str(id)
         # ans[sampleID] = sample
-        sample = remove_keyword(keyword, sample)  # remove prefix in the return sentence
+        sample = remove_keyword(seg_keyword_without_oov, sample)  # remove prefix in the return sentence
         sample = remove_last_sentence(sample)  # remove last sentence
         sample = remove_duplicated_sub_sentence(sample)  # remove same words in a sentence
         sampleList.append(sample)
-        logList.append(keyword + ", " + sample + "\n")
+        logList.append(str(id) + ": " + sample + "\n")
     tool_box.append_file(logFile, logList)
     ans["samples"] = sampleList
     return ans
@@ -160,8 +163,8 @@ if __name__ == '__main__':
     # result = chinese_post_processing(data, chinese_search_template)
     # tool_box.write_file(writeFile, result)
     ans = getResult("aaa", 5)
-    #ans = remove_last_sentence(str3)
-    #ans = remove_duplicated_sub_sentence(str3)
+    # ans = remove_last_sentence(str3)
+    # ans = remove_duplicated_sub_sentence(str3)
     # print(ans)
     result = datetime.now().strftime("%Y-%m-%d %H:%M:%S %p")
     print(ans)
