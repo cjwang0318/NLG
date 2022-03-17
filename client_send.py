@@ -17,15 +17,16 @@ def call_CKIP(query):
     seg_query = ""
     if res.ok:
         outputs = res.json()
-        print(outputs)
+        #print(outputs)
         for word in outputs[0]:
             seg_query = seg_query + " " + word
     seg_query = seg_query.strip()
-    print(seg_query)
+    #print(seg_query)
     end = time.time()
     print('time: ', end - start)
+    return seg_query
 
 
 if __name__ == '__main__':
-    keyword = "妮維雅q10plus美體緊膚乳液400ml"
+    keyword = "時尚風公主裙"
     call_CKIP(keyword)
