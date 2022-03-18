@@ -125,7 +125,7 @@ def getResult(keyword, seg_keywords, seg_keyword_without_oov, nsamples):
 
     seg_keyword_without_oov = convert_s2c(seg_keyword_without_oov)
     # transform to json format
-    ans = {"keyword": seg_keyword_without_oov, "nsamples": nsamples}
+    ans = {"keyword": str(keyword), "nsamples": str(nsamples)}
     sampleList = []
     logList = []
     time = datetime.now().strftime("%Y-%m-%d %H:%M:%S %p")
@@ -162,7 +162,7 @@ if __name__ == '__main__':
 
     # result = chinese_post_processing(data, chinese_search_template)
     # tool_box.write_file(writeFile, result)
-    ans = getResult("aaa", 5)
+    ans = getResult("aaa","aaa","aaa", 5)
     # ans = remove_last_sentence(str3)
     # ans = remove_duplicated_sub_sentence(str3)
     # print(ans)

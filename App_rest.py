@@ -85,11 +85,15 @@ class web_server:
         # print(cmd)
         # os.system(cmd)
         #print("seg_keyword_without_oov="+seg_keyword_without_oov)
-        gs.generator_rest(seg_keyword_without_oov, self.model, self.tokenizer)
-        # call postProcessing
-        seg_keyword_without_oov=seg_keyword_without_oov.replace(" ","")
-        #print("seg_keyword_without_oov_whitespace=" + seg_keyword_without_oov)
-        answer=PostProcessing.getResult(keyword, seg_keywords, seg_keyword_without_oov, nsamples)
+
+        if seg_keyword_without_oov =="":
+            answer = {"keyword": str(keyword), "nsamples": str(nsamples),"samples":["對不起～此關鍵字無相關可推薦文案"]}
+        else:
+            gs.generator_rest(seg_keyword_without_oov, self.model, self.tokenizer)
+            # call postProcessing
+            seg_keyword_without_oov=seg_keyword_without_oov.replace(" ","")
+            #print("seg_keyword_without_oov_whitespace=" + seg_keyword_without_oov)
+            answer=PostProcessing.getResult(keyword, seg_keywords, seg_keyword_without_oov, nsamples)
 
         # change status
         self.status = "free"
