@@ -140,8 +140,9 @@ def getResult(keyword, seg_keywords, seg_keyword_without_oov, nsamples):
         sample = remove_keyword(seg_keyword_without_oov, sample)  # remove prefix in the return sentence
         sample = remove_last_sentence(sample)  # remove last sentence
         sample = remove_duplicated_sub_sentence(sample)  # remove same words in a sentence
-        sampleList.append(sample)
         logList.append(str(id) + ": " + sample + "\n")
+        sample = sample.replace("[UNK]","")
+        sampleList.append(sample)
     tool_box.append_file(logFile, logList)
     ans["samples"] = sampleList
     return ans
