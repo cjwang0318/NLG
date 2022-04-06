@@ -68,6 +68,9 @@ class web_server:
         keyword = content['keyword']
         nsamples = args.nsamples
 
+        #tranform to lowcase
+        keyword=keyword.lower()
+
         # call segmentation
         #print("keyword="+keyword)
         seg_keywords = cs.call_CKIP(keyword)
