@@ -46,7 +46,7 @@ class web_server:
         return answer
 
     def convert_tw2s(self, str):
-        cc = OpenCC('tw2s')  # convert from Simplified Chinese to Traditional Chinese
+        cc = OpenCC('tw2sp')  # convert from Simplified Chinese to Traditional Chinese
         converted = cc.convert(str)
         return converted
 

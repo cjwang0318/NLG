@@ -7,7 +7,7 @@ from datetime import datetime
 
 
 def convert_s2c(str):
-    cc = OpenCC('s2tw')  # convert from Simplified Chinese to Traditional Chinese
+    cc = OpenCC('s2twp')  # convert from Simplified Chinese to Traditional Chinese
     converted = cc.convert(str)
     return converted
 
