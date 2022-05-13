@@ -26,9 +26,25 @@ def call_CKIP(query):
     #print('time: ', end - start)
     return seg_query
 
+def call_nlg(query):
+    sendMessage_query = {
+        "keyword": query,
+        "nsamples": args.nsamples
+    }
+    start = time.time()
+    # sent json to server
+    res = requests.post('http://192.168.50.32:5000/getResult', json=sendMessage_query)
+    if res.ok:
+        outputs = res.json()
+        print(outputs)
+
+    end = time.time()
+    print('time: ', end - start)
+    return outputs
 
 
 if __name__ == '__main__':
     keyword = "時尚風西裝"
-    seg_query=call_CKIP(keyword)
-    print(seg_query)
+    #seg_query=call_CKIP(keyword)
+    #print(seg_query)
+    call_nlg(keyword)

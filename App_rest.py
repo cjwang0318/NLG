@@ -63,6 +63,9 @@ class web_server:
         # change status
         self.status = "processing"
 
+        # generate model type
+        generate_type="GPT2"
+
         # decode json
         content = request.json
         keyword = content['keyword']
@@ -96,7 +99,7 @@ class web_server:
             # call postProcessing
             seg_keyword_without_oov=seg_keyword_without_oov.replace(" ","")
             #print("seg_keyword_without_oov_whitespace=" + seg_keyword_without_oov)
-            answer=PostProcessing.getResult(keyword, seg_keywords, seg_keyword_without_oov, nsamples)
+            answer=PostProcessing.getResult(keyword, seg_keywords, seg_keyword_without_oov, nsamples, generate_type)
 
         # change status
         self.status = "free"

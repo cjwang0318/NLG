@@ -114,7 +114,7 @@ def remove_duplicated_sub_sentence(str):
     return no_duplicated_sentence
 
 
-def getResult(keyword, seg_keywords, seg_keyword_without_oov, nsamples):
+def getResult(keyword, seg_keywords, seg_keyword_without_oov, nsamples, generate_type):
     chinese_search_template = '，。！'
     dataPath = "./output/"
     readFile = "samples.txt"
@@ -133,6 +133,7 @@ def getResult(keyword, seg_keywords, seg_keyword_without_oov, nsamples):
     logList.append("原始關鍵字：" + keyword + "\n")
     logList.append("CKIP斷詞關鍵字：" + seg_keywords + "\n")
     logList.append("進入生成系統關鍵字：" + seg_keyword_without_oov + "\n")
+    logList.append("生成模型類別：" + generate_type + "\n")
     for id, sample in enumerate(result):
         # print(id)
         # sampleID = "sample_" + str(id)
@@ -140,8 +141,8 @@ def getResult(keyword, seg_keywords, seg_keyword_without_oov, nsamples):
         sample = remove_keyword(seg_keyword_without_oov, sample)  # remove prefix in the return sentence
         sample = remove_last_sentence(sample)  # remove last sentence
         sample = remove_duplicated_sub_sentence(sample)  # remove same words in a sentence
-        logList.append(str(id) + ": " + sample + "\n")
-        sample = sample.replace("[UNK]","")
+        logList.append("文案" + str(id) + ":\t" + sample + "\n")
+        sample = sample.replace("[UNK]", "")
         sampleList.append(sample)
     tool_box.append_file(logFile, logList)
     ans["samples"] = sampleList
@@ -163,7 +164,7 @@ if __name__ == '__main__':
 
     # result = chinese_post_processing(data, chinese_search_template)
     # tool_box.write_file(writeFile, result)
-    ans = getResult("aaa","aaa","aaa", 5)
+    ans = getResult("aaa", "aaa", "aaa", 5, "GPT2")
     # ans = remove_last_sentence(str3)
     # ans = remove_duplicated_sub_sentence(str3)
     # print(ans)
