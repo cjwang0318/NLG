@@ -1,18 +1,33 @@
 import tool_box as tb
-from opencc import OpenCC
 
-def convert_s2c(str):
-    cc = OpenCC('s2tw')  # convert from Simplified Chinese to Traditional Chinese
-    converted = cc.convert(str)
-    return converted
-
-dict=[]
-#dataset=tb.read_file("./vocab_clothes_normalized.txt",0)
-dataset=tb.read_file("./vocab_desc_only_normalized.txt",0)
-for line in dataset:
-    if len(line)<2:
-        continue
+def isEnglish(s):
+    try:
+        s.encode(encoding='utf-8').decode('ascii')
+    except UnicodeDecodeError:
+        return False
     else:
-        #line=convert_s2c(line)
-        dict.append(line+",1\n")
-tb.write_file("./dict.csv",dict)
+        return True
+
+def dictionary_generation(path):
+    dict=[]
+    dataset=tb.read_file(path,0)
+    for line in dataset:
+        if len(line)<2: #判斷長度
+            continue
+        elif(isEnglish(line)): #判斷是否為英文
+            continue
+        else:
+            #line=convert_s2c(line)
+            dict.append(line+",1\n")
+    tb.write_file("./dict.csv",dict)
+
+if __name__ == '__main__':
+    path="./vocab_desc_only_normalized.txt"
+    dictionary_generation(path)
+
+    # keyword1 = "時尚風西裝"
+    # keyword2 = "裝aa"
+    # keyword3 = "abc"
+    # print(isEnglish(keyword1))
+    # print(isEnglish(keyword2))
+    # print(isEnglish(keyword3))
