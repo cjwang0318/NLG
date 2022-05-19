@@ -8,7 +8,7 @@ if __name__ == '__main__':
         if "----- " in line:
             keyword = ""
             type = ""
-        if "原始關鍵字：" in line:
+        if "進入生成系統關鍵字：" in line:
             temp = line.split("：")
             keyword = temp[1]
             continue

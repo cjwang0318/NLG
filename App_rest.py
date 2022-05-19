@@ -9,6 +9,7 @@ import args
 import generate_rest as gs
 import tool_box as tb
 import client_send as cs
+import dictionary_search as ds
 from transformers import GPT2LMHeadModel
 
 
@@ -31,8 +32,13 @@ class web_server:
         self.tokenizer = tokenization_bert.BertTokenizer(vocab_file=args.tokenizer_path)
         self.model = GPT2LMHeadModel.from_pretrained(args.model_path)
 
-        # init vocab list for checking word is [NUK] or not?
+        # init vocab list for checking word is [UNK] or not?
         self.vocabList = tb.read_file(args.tokenizer_path, 0)
+
+        # init description dictionary search
+        self.description_generation_threshold = args.description_generation_threshold
+        self.description_path = args.description_path
+        self.dict = ds.load_data(self.description_path)
 
         # record status
         self.status = "free"
@@ -63,43 +69,54 @@ class web_server:
         # change status
         self.status = "processing"
 
-        # generate model type
-        generate_type="GPT2"
-
         # decode json
         content = request.json
         keyword = content['keyword']
         nsamples = args.nsamples
 
-        #tranform to lowcase
-        keyword=keyword.lower()
+        # tranform to lowcase
+        keyword = keyword.lower()
 
         # call segmentation
-        #print("keyword="+keyword)
+        # print("keyword="+keyword)
         seg_keywords = cs.call_CKIP(keyword)
-        #print("CKIP="+seg_keywords)
+        # print("CKIP="+seg_keywords)
 
         # translate to simple Chinese(List to String)
         seg_keywords_simple = self.convert_tw2s(seg_keywords)
-        #print("simple Chinese=" + keyword)
+        # print("simple Chinese=" + keyword)
 
         # OOV checking
         seg_keyword_without_oov = self.oov_checking(seg_keywords_simple, self.vocabList)
-        #answer = {"keyword": seg_keyword_without_oov}
+        # answer = {"keyword": seg_keyword_without_oov}
         # call generator
         # cmd = 'python ./generate.py --device=0 --length=30 --temperature=0.3 --topk=20 --nsamples='+str(nsamples)+' --prefix='+str(keyword)+' --fast_pattern --save_samples --save_samples_path=./output'
         # print(cmd)
         # os.system(cmd)
-        #print("seg_keyword_without_oov="+seg_keyword_without_oov)
+        # print("seg_keyword_without_oov="+seg_keyword_without_oov)
 
-        if seg_keyword_without_oov =="":
-            answer = {"keyword": str(keyword), "nsamples": str(nsamples),"samples":["對不起～此關鍵字無相關可推薦文案"]}
+        # description dictionary search check
+        flag = ds.dictionary_search_check(seg_keyword_without_oov, self.dict, self.description_generation_threshold)
+        #print("flag=" + str(flag))
+
+        if seg_keyword_without_oov == "":
+            answer = {"keyword": str(keyword), "nsamples": str(nsamples), "samples": ["對不起～此關鍵字無相關文案可推薦"]}
+        elif flag:
+            # generate model type
+            generate_type = "DICT"
+            keyword_without_oov = seg_keyword_without_oov.replace(" ", "")
+            answer = ds.dictionary_search_rest(self.dict, keyword, seg_keywords, keyword_without_oov, nsamples, generate_type)
         else:
+            # generate model type
+            generate_type = "GPT2"
+
+            # call GPT2 NLG Engine
             gs.generator_rest(seg_keyword_without_oov, self.model, self.tokenizer)
+
             # call postProcessing
-            seg_keyword_without_oov=seg_keyword_without_oov.replace(" ","")
-            #print("seg_keyword_without_oov_whitespace=" + seg_keyword_without_oov)
-            answer=PostProcessing.getResult(keyword, seg_keywords, seg_keyword_without_oov, nsamples, generate_type)
+            keyword_without_oov = seg_keyword_without_oov.replace(" ", "")
+            # print("seg_keyword_without_oov_whitespace=" + seg_keyword_without_oov)
+            answer = PostProcessing.getResult(keyword, seg_keywords, keyword_without_oov, nsamples, generate_type)
 
         # change status
         self.status = "free"
