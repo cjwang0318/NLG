@@ -74,21 +74,33 @@ class web_server:
         keyword = content['keyword']
         nsamples = args.nsamples
 
-        # tranform to lowcase
-        keyword = keyword.lower()
+        # generation level
+        if args.segment:
+            generate_level = "詞"
+        else:
+            generate_level = "字"
 
-        # call segmentation
-        # print("keyword="+keyword)
-        seg_keywords = cs.call_CKIP(keyword)
-        # print("CKIP="+seg_keywords)
+        if generate_level == "詞":
+            # transform to lowercase
+            keyword = keyword.lower()
 
-        # translate to simple Chinese(List to String)
-        seg_keywords_simple = self.convert_tw2s(seg_keywords)
-        # print("simple Chinese=" + keyword)
+            # call segmentation
+            # print("keyword="+keyword)
+            seg_keywords = cs.call_CKIP(keyword)
+            # print("CKIP="+seg_keywords)
 
-        # OOV checking
-        seg_keyword_without_oov = self.oov_checking(seg_keywords_simple, self.vocabList)
-        # answer = {"keyword": seg_keyword_without_oov}
+            # translate to simple Chinese(List to String)
+            seg_keywords_simple = self.convert_tw2s(seg_keywords)
+            # print("simple Chinese=" + keyword)
+
+            # OOV checking
+            seg_keyword_without_oov = self.oov_checking(seg_keywords_simple, self.vocabList)
+            # answer = {"keyword": seg_keyword_without_oov}
+        else:
+            seg_keywords = "字版NLG無須斷詞"
+            seg_keywords_simple = self.convert_tw2s(keyword)
+            seg_keyword_without_oov = seg_keywords_simple
+
         # call generator
         # cmd = 'python ./generate.py --device=0 --length=30 --temperature=0.3 --topk=20 --nsamples='+str(nsamples)+' --prefix='+str(keyword)+' --fast_pattern --save_samples --save_samples_path=./output'
         # print(cmd)
@@ -97,7 +109,7 @@ class web_server:
 
         # description dictionary search check
         flag = ds.dictionary_search_check(seg_keyword_without_oov, self.dict, self.description_generation_threshold)
-        #print("flag=" + str(flag))
+        # print("flag=" + str(flag))
 
         if seg_keyword_without_oov == "":
             answer = {"keyword": str(keyword), "nsamples": str(nsamples), "samples": ["對不起～此關鍵字無相關文案可推薦"]}
@@ -105,7 +117,8 @@ class web_server:
             # generate model type
             generate_type = "DICT"
             keyword_without_oov = seg_keyword_without_oov.replace(" ", "")
-            answer = ds.dictionary_search_rest(self.dict, keyword, seg_keywords, keyword_without_oov, nsamples, generate_type)
+            answer = ds.dictionary_search_rest(self.dict, keyword, seg_keywords, keyword_without_oov, nsamples,
+                                               generate_type)
         else:
             # generate model type
             generate_type = "GPT2"
