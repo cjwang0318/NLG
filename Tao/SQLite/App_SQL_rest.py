@@ -47,7 +47,8 @@ class web_server:
             generate_type = "SQL"
             seg_keywords = keyword
             keyword_without_oov = keyword
-            answer = ss.log_results(keyword, seg_keywords, keyword_without_oov, results, generate_type)
+            answer = {"keyword": str(keyword_without_oov), "nsamples": str(nsamples), "samples": results}
+            ss.log_results(keyword, seg_keywords, keyword_without_oov, results, generate_type)
         # change status
         self.status = "free"
         return answer

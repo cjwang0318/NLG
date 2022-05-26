@@ -1,6 +1,8 @@
 import sqlite3
 from datetime import datetime
 import random
+import sys
+sys.path.append("..")
 import tool_box as tb
 
 
