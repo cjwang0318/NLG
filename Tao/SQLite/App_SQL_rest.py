@@ -1,6 +1,7 @@
 from flask import Flask, request
 import sqlite3
 import sql_search as ss
+import SQLite_args as args
 
 
 class web_server:
@@ -15,7 +16,7 @@ class web_server:
         # self.app.add_url_rule('/image/query', view_func=self.queryImg, methods=['GET'])
 
         # init sqlite core
-        self.db = sqlite3.connect('./tao_test.db')
+        self.db = sqlite3.connect(args.database)
         self.cursor = self.db.cursor()
 
         # record status
@@ -36,19 +37,31 @@ class web_server:
         # decode json
         content = request.json
         keyword = content['keyword']
-        nsamples = 5
+        nsamples = args.nsamples
 
-        results = ss.get_result(self.cursor, keyword, nsamples)
-
-        if results == None:
-            answer = {"keyword": str(keyword), "nsamples": str(nsamples), "samples": ["對不起～此關鍵字無相關文案可推薦"]}
+        search_type = args.search_type
+        if (search_type == 'exactly_search'):
+            results = ss.get_result(self.cursor, keyword, nsamples)
+            if results == None:
+                answer = {"keyword": str(keyword), "nsamples": str(nsamples), "samples": ["對不起～此關鍵字無相關文案可推薦"]}
+            else:
+                # generate model type
+                generate_type = "exactly_search"
+                seg_keywords = keyword
+                sql_search_keyword = keyword
+                answer = {"keyword": str(sql_search_keyword), "nsamples": str(nsamples), "samples": results}
+                ss.log_results(keyword, seg_keywords, sql_search_keyword, results, generate_type)
+        elif (search_type == 'seg_search'):
+            seg_keywords, keyword_list = ss.generate_candidate_keyword_list(keyword)
+            sql_search_keyword, results = ss.get_seg_result(self.cursor, keyword_list, nsamples)
+            if results == None:
+                answer = {"keyword": str(keyword), "nsamples": str(nsamples), "samples": ["對不起～此關鍵字無相關文案可推薦"]}
+            else:
+                generate_type = "seg_search"
+                answer = {"keyword": str(sql_search_keyword), "nsamples": str(nsamples), "samples": results}
+                ss.log_results(keyword, seg_keywords, sql_search_keyword, results, generate_type)
         else:
-            # generate model type
-            generate_type = "SQL"
-            seg_keywords = keyword
-            keyword_without_oov = keyword
-            answer = {"keyword": str(keyword_without_oov), "nsamples": str(nsamples), "samples": results}
-            ss.log_results(keyword, seg_keywords, keyword_without_oov, results, generate_type)
+            answer = {"keyword": str(keyword), "nsamples": str(nsamples), "samples": ["對不起～系統發生錯誤"]}
         # change status
         self.status = "free"
         return answer

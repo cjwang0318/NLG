@@ -2,8 +2,12 @@ import sqlite3
 from datetime import datetime
 import random
 import sys
+import time
+import CKIP as cs
+
 sys.path.append("..")
 import tool_box as tb
+
 
 
 def insert_data(cursor):
@@ -41,6 +45,38 @@ def get_result(cursor, keyword, topk):
         return list[:topk]
 
 
+def generate_candidate_keyword_list(keyword):
+    seg_keywords = cs.call_CKIP(keyword)
+    seg_keywords_list = seg_keywords.split(" ")
+    keyword_len = len(seg_keywords_list)
+    i = 0
+    keyword_list = []
+    while i < keyword_len:
+        temp = ""
+        j = i
+        while j < keyword_len:
+            temp = temp + seg_keywords_list[j] + " "
+            j = j + 1
+        temp = temp.strip()
+        keyword_list.append(temp)
+        # print(temp)
+        i = i + 1
+    return seg_keywords, keyword_list
+
+
+def get_seg_result(cursor, keyword_list, topk):
+    for keyword in keyword_list:
+        # print(keyword)
+        results = get_result(cursor, keyword, topk)
+        results_remove_apace = []
+        if results != None:
+            for item in results:
+                item = item.replace(" ", "")
+                results_remove_apace.append(item)
+            return keyword, results_remove_apace
+    return keyword, results
+
+
 def log_results(keyword, seg_keywords, keyword_without_oov, result, generate_type):
     logList = []
     logFile = "logSQL.txt"
@@ -56,15 +92,22 @@ def log_results(keyword, seg_keywords, keyword_without_oov, result, generate_typ
 
 
 if __name__ == '__main__':
-    db = sqlite3.connect('./tao_test.db')
+    db = sqlite3.connect('./tao_seg_cht.db')
     cursor = db.cursor()
-    results = select(cursor)
-    #
-    results = get_result(cursor, "bba", 3)
-    if results == None:
-        print("no results")
-    else:
-        print(results)
-
-    db.commit()
-    db.close()
+    # results = select(cursor)
+    # results = get_result(cursor, "bba", 3)
+    # if results == None:
+    #     print("no results")
+    # else:
+    #     print(results)
+    # db.commit()
+    # db.close()
+    start = time.time()
+    seg_keywords, keyword_list = generate_candidate_keyword_list("超級無敵馬甲西裝")
+    print(seg_keywords)
+    # print(keyword_list)
+    keyword, ans = get_seg_result(cursor, keyword_list, 5)
+    end = time.time()
+    print('time: ', end - start)
+    print(keyword)
+    print(ans)
