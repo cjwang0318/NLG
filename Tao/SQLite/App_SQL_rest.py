@@ -2,6 +2,7 @@ from flask import Flask, request
 import sqlite3
 import sql_search as ss
 import SQLite_args as args
+import NLG_client as nc
 
 
 class web_server:
@@ -62,7 +63,12 @@ class web_server:
                 ss.log_results(keyword, seg_keywords, sql_search_keyword, results, generate_type)
         else:
             answer = {"keyword": str(keyword), "nsamples": str(nsamples), "samples": ["對不起～系統發生錯誤"]}
-        # change status
+
+        # 如果SQL搜尋沒有找到文案，是否使用NLG模式生成文案
+        if (args.NLG_operation and results == None):
+            answer = nc.call_nlg(keyword)
+
+            # change status
         self.status = "free"
         return answer
 
