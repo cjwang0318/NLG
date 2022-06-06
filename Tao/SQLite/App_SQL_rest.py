@@ -39,6 +39,7 @@ class web_server:
         content = request.json
         keyword = content['keyword']
         nsamples = args.nsamples
+        nkeywords = args.nkeywords
 
         search_type = args.search_type
         if (search_type == 'exactly_search'):
@@ -59,6 +60,15 @@ class web_server:
                 answer = {"keyword": str(keyword), "nsamples": str(nsamples), "samples": ["對不起～此關鍵字無相關文案可推薦"]}
             else:
                 generate_type = "seg_search"
+                answer = {"keyword": str(sql_search_keyword), "nsamples": str(nsamples), "samples": results}
+                ss.log_results(keyword, seg_keywords, sql_search_keyword, results, generate_type)
+        elif (search_type == 'key_search'):
+            seg_keywords, keyword_SQLquery_list = ss.generate_candidate_query_list(keyword, nkeywords)
+            sql_search_keyword, results = ss.get_keyword_result(self.cursor, keyword_SQLquery_list, nsamples)
+            if results == None:
+                answer = {"keyword": str(keyword), "nsamples": str(nsamples), "samples": ["對不起～此關鍵字無相關文案可推薦"]}
+            else:
+                generate_type = "key_search"
                 answer = {"keyword": str(sql_search_keyword), "nsamples": str(nsamples), "samples": results}
                 ss.log_results(keyword, seg_keywords, sql_search_keyword, results, generate_type)
         else:

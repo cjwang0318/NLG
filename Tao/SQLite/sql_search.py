@@ -62,12 +62,12 @@ def generate_candidate_keyword_list(keyword):
 
 
 def query_construction(keyword_list):
-    query = "SELECT * FROM `itemName_ID` WHERE "
+    query = "SELECT `description` FROM `description` WHERE "
     keyword_len = len(keyword_list)
     tmp = ""
     i = 1
     for item in keyword_list:
-        str = "`itemName` LIKE '%" + item + "%'"
+        str = "`description` LIKE '%" + item + "%'"
         if i < keyword_len:
             tmp = tmp + str + " AND "
         else:
@@ -76,9 +76,17 @@ def query_construction(keyword_list):
     return query + tmp
 
 
-def generate_candidate_query_list(keyword):
+def generate_candidate_query_list(keyword, nkeywords):
     seg_keywords = cs.call_CKIP(keyword)
-    keyword_list = cs.call_keyword_extraction(seg_keywords)
+    seg_keywords_list = seg_keywords.split(" ")
+    num_keywords = len(seg_keywords_list)
+    # 如果斷詞後字數大於閥值才會呼叫關鍵字擷取API
+    if num_keywords > nkeywords:
+        keyword_list = cs.call_keyword_extraction(seg_keywords)
+        # 將關鍵詞擷取後的結果加到seg_keywords
+        seg_keywords = seg_keywords + "=>關鍵詞擷取結果[" + ', '.join(keyword_list) + "]"
+    else:
+        keyword_list = seg_keywords_list
     keyword_len = len(keyword_list)
     i = 0
     result = []
@@ -90,7 +98,7 @@ def generate_candidate_query_list(keyword):
         # print(query)
         result.append(str1 + "\t" + query)
         i = i + 1
-    return result
+    return seg_keywords, result
 
 
 def get_seg_result(cursor, keyword_list, topk):
@@ -133,8 +141,8 @@ def log_results(keyword, seg_keywords, keyword_without_oov, result, generate_typ
 
 
 if __name__ == '__main__':
-    # db = sqlite3.connect('./tao_seg_cht.db')
-    # cursor = db.cursor()
+    db = sqlite3.connect('./tao_cht.db')
+    cursor = db.cursor()
     # results = select(cursor)
     # results = get_result(cursor, "bba", 3)
     # if results == None:
@@ -144,10 +152,19 @@ if __name__ == '__main__':
     # db.commit()
     # db.close()
     start = time.time()
+    # seg search testing
     # seg_keywords, keyword_list = generate_candidate_keyword_list("超級無敵馬甲西裝")
-    seg_keywords = generate_candidate_query_list("超級無敵馬甲西裝")
-    print(seg_keywords)
     # print(keyword_list)
     # keyword, ans = get_seg_result(cursor, keyword_list, 5)
+    # print(keyword)
+    # print(ans)
+
+    # keyword search testing
+    seg_keywords, keyword_query = generate_candidate_query_list("樂活e棧-聖誕節MIT豪華加厚禦寒版-聖誕老人服裝(豪華5件套組)", 3)
+    print(seg_keywords)
+    print(keyword_query)
+    # sql_search_keyword, results=get_keyword_result(cursor, keyword_query, 5)
+    # print(sql_search_keyword)
+    # print(results)
     end = time.time()
     print('time: ', end - start)
