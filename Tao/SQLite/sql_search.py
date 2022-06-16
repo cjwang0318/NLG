@@ -61,7 +61,7 @@ def generate_candidate_keyword_list(keyword):
     return seg_keywords, keyword_list
 
 
-def query_construction(keyword_list):
+def query_construction_desc_only(keyword_list):
     query = "SELECT `description` FROM `description` WHERE "
     keyword_len = len(keyword_list)
     tmp = ""
@@ -74,6 +74,25 @@ def query_construction(keyword_list):
             tmp = tmp + str
         i = i + 1
     return query + tmp
+
+
+def query_construction_item_desc(keyword_list):
+    query = "SELECT `description` FROM `item_desc_cht` WHERE "
+    keyword_len = len(keyword_list)
+    tmp_item = ""
+    tmp_desc = ""
+    i = 1
+    for item in keyword_list:
+        str_item = "`itemName` LIKE '%" + item + "%'"
+        str_desc = "`description` LIKE '%" + item + "%'"
+        if i < keyword_len:
+            tmp_item = tmp_item + str_item + " AND "
+            tmp_desc = tmp_desc + str_desc + " AND "
+        else:
+            tmp_item = tmp_item + str_item
+            tmp_desc = tmp_desc + str_desc
+        i = i + 1
+    return query + "(" + tmp_item + ") OR (" + tmp_desc + ")"
 
 
 def generate_candidate_query_list(keyword, nkeywords):
@@ -94,7 +113,10 @@ def generate_candidate_query_list(keyword, nkeywords):
         temp = keyword_list[:keyword_len - i]
         # print(temp)
         str1 = ' '.join(temp)
-        query = query_construction(temp)
+        # 只搜尋description
+        # query = query_construction_desc_only(temp)
+        # 同時搜尋itemName & description
+        query = query_construction_item_desc(temp)
         # print(query)
         result.append(str1 + "\t" + query)
         i = i + 1
