@@ -152,7 +152,7 @@ def get_keyword_result(cursor, keyword_list, topk):
 
 def log_results(keyword, seg_keywords, keyword_without_oov, result, generate_type):
     logList = []
-    logFile = "logSQL.txt"
+    logFile = "log.txt"
     time = datetime.now().strftime("%Y-%m-%d %H:%M:%S %p")
     logList.append("----- " + time + " -----\n")
     logList.append("原始關鍵字：" + keyword + "\n")

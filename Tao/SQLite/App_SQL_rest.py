@@ -3,6 +3,10 @@ import sqlite3
 import sql_search as ss
 import SQLite_args as args
 import NLG_client as nc
+import sys
+
+sys.path.append("..")
+import dictionary_search as ds
 
 
 class web_server:
@@ -19,6 +23,11 @@ class web_server:
         # init sqlite core
         self.db = sqlite3.connect(args.database)
         self.cursor = self.db.cursor()
+
+        # init description dictionary search
+        self.description_generation_threshold = args.description_generation_threshold
+        self.description_path = args.description_path
+        self.dict = ds.load_data(self.description_path)
 
         # record status
         self.status = "free"
@@ -42,43 +51,50 @@ class web_server:
         nkeywords = args.nkeywords
 
         search_type = args.search_type
-        if (search_type == 'exactly_search'):
-            results = ss.get_result(self.cursor, keyword, nsamples)
-            if results == None:
-                answer = {"keyword": str(keyword), "nsamples": str(nsamples), "samples": ["對不起～此關鍵字無相關文案可推薦"]}
-            else:
-                # generate model type
-                generate_type = "exactly_search"
-                seg_keywords = keyword
-                sql_search_keyword = keyword
-                answer = {"keyword": str(sql_search_keyword), "nsamples": str(nsamples), "samples": results}
-                ss.log_results(keyword, seg_keywords, sql_search_keyword, results, generate_type)
-        elif (search_type == 'seg_search'):
-            seg_keywords, keyword_list = ss.generate_candidate_keyword_list(keyword)
-            sql_search_keyword, results = ss.get_seg_result(self.cursor, keyword_list, nsamples)
-            if results == None:
-                answer = {"keyword": str(keyword), "nsamples": str(nsamples), "samples": ["對不起～此關鍵字無相關文案可推薦"]}
-            else:
-                generate_type = "seg_search"
-                answer = {"keyword": str(sql_search_keyword), "nsamples": str(nsamples), "samples": results}
-                ss.log_results(keyword, seg_keywords, sql_search_keyword, results, generate_type)
-        elif (search_type == 'key_search'):
-            seg_keywords, keyword_SQLquery_list = ss.generate_candidate_query_list(keyword, nkeywords)
-            sql_search_keyword, results = ss.get_keyword_result(self.cursor, keyword_SQLquery_list, nsamples)
-            if results == None:
-                answer = {"keyword": str(keyword), "nsamples": str(nsamples), "samples": ["對不起～此關鍵字無相關文案可推薦"]}
-            else:
-                generate_type = "key_search"
-                answer = {"keyword": str(sql_search_keyword), "nsamples": str(nsamples), "samples": results}
-                ss.log_results(keyword, seg_keywords, sql_search_keyword, results, generate_type)
+        # description dictionary search check 優良文案字典查詢
+        flag = ds.dictionary_search_check(keyword, self.dict, self.description_generation_threshold)
+        # print("flag="+str(flag))
+        if flag:
+            # 使用優良文案回傳
+            generate_type = "DICT"
+            answer = ds.dictionary_search_rest(self.dict, keyword, keyword, keyword, nsamples, generate_type)
         else:
-            answer = {"keyword": str(keyword), "nsamples": str(nsamples), "samples": ["對不起～系統發生錯誤"]}
+            if (search_type == 'exactly_search'):
+                results = ss.get_result(self.cursor, keyword, nsamples)
+                if results == None:
+                    answer = {"keyword": str(keyword), "nsamples": str(nsamples), "samples": ["對不起～此關鍵字無相關文案可推薦"]}
+                else:
+                    # generate model type
+                    generate_type = "exactly_search"
+                    seg_keywords = keyword
+                    sql_search_keyword = keyword
+                    answer = {"keyword": str(sql_search_keyword), "nsamples": str(nsamples), "samples": results}
+                    ss.log_results(keyword, seg_keywords, sql_search_keyword, results, generate_type)
+            elif (search_type == 'seg_search'):
+                seg_keywords, keyword_list = ss.generate_candidate_keyword_list(keyword)
+                sql_search_keyword, results = ss.get_seg_result(self.cursor, keyword_list, nsamples)
+                if results == None:
+                    answer = {"keyword": str(keyword), "nsamples": str(nsamples), "samples": ["對不起～此關鍵字無相關文案可推薦"]}
+                else:
+                    generate_type = "seg_search"
+                    answer = {"keyword": str(sql_search_keyword), "nsamples": str(nsamples), "samples": results}
+                    ss.log_results(keyword, seg_keywords, sql_search_keyword, results, generate_type)
+            elif (search_type == 'key_search'):
+                seg_keywords, keyword_SQLquery_list = ss.generate_candidate_query_list(keyword, nkeywords)
+                sql_search_keyword, results = ss.get_keyword_result(self.cursor, keyword_SQLquery_list, nsamples)
+                if results == None:
+                    answer = {"keyword": str(keyword), "nsamples": str(nsamples), "samples": ["對不起～此關鍵字無相關文案可推薦"]}
+                else:
+                    generate_type = "key_search"
+                    answer = {"keyword": str(sql_search_keyword), "nsamples": str(nsamples), "samples": results}
+                    ss.log_results(keyword, seg_keywords, sql_search_keyword, results, generate_type)
+            else:
+                answer = {"keyword": str(keyword), "nsamples": str(nsamples), "samples": ["對不起～系統發生錯誤"]}
+            # 如果SQL搜尋沒有找到文案，是否使用NLG模式生成文案
+            if (args.NLG_operation and results == None):
+                answer = nc.call_nlg(keyword)
 
-        # 如果SQL搜尋沒有找到文案，是否使用NLG模式生成文案
-        if (args.NLG_operation and results == None):
-            answer = nc.call_nlg(keyword)
-
-            # change status
+        # change status
         self.status = "free"
         return answer
 

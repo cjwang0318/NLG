@@ -1,5 +1,5 @@
 # exactly_search &  key_search使用沒斷詞的資料庫
-database = './tao_cht.db'
+database = './tao_item_desc_cht.db'
 # seg_search 使用 斷詞後的資料庫
 # database = './tao_seg_cht.db'
 nsamples = 5
@@ -17,3 +17,5 @@ keyword_extraction_server_IP = "192.168.50.29:5001"
 nkeywords = 3
 dictionary = "tao_top100K"
 NLG_operation = True
+description_path = "../dict/2022-06-16_update.txt"  # 使用文案字典的位置
+description_generation_threshold = 0.01  # 使用文案字典的機率，閥值設定約低越容易使用文案字典
