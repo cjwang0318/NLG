@@ -105,6 +105,8 @@ def generate_candidate_query_list(keyword, nkeywords):
         # 將關鍵詞擷取後的結果加到seg_keywords
         seg_keywords = seg_keywords + "=>關鍵詞擷取結果[" + ', '.join(keyword_list) + "]"
     else:
+        #將keyword_list中的元素倒排序，因為最重要的字(名詞)可能會再最後面
+        seg_keywords_list.reverse()
         keyword_list = seg_keywords_list
     keyword_len = len(keyword_list)
     i = 0
@@ -182,7 +184,8 @@ if __name__ == '__main__':
     # print(ans)
 
     # keyword search testing
-    seg_keywords, keyword_query = generate_candidate_query_list("樂活e棧-聖誕節MIT豪華加厚禦寒版-聖誕老人服裝(豪華5件套組)", 3)
+    #seg_keywords, keyword_query = generate_candidate_query_list("樂活e棧-聖誕節MIT豪華加厚禦寒版-聖誕老人服裝(豪華5件套組)", 3)
+    seg_keywords, keyword_query = generate_candidate_query_list("協發行泡菜", 3)
     print(seg_keywords)
     print(keyword_query)
     # sql_search_keyword, results=get_keyword_result(cursor, keyword_query, 5)
