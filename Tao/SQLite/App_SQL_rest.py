@@ -91,8 +91,12 @@ class web_server:
             else:
                 answer = {"keyword": str(keyword), "nsamples": str(nsamples), "samples": ["對不起～系統發生錯誤"]}
             # 如果SQL搜尋沒有找到文案，是否使用NLG模式生成文案
+            # results = None
             if (args.NLG_operation and results == None):
-                answer = nc.call_nlg(keyword)
+                # 如果使用NLG模型，進入系統使用關鍵字為關鍵詞擷取後的結果，不是原本的完整的查詢詞
+                item_split = keyword_SQLquery_list[0].split("\t")
+                nlg_keyword = item_split[0]
+                answer = nc.call_nlg(nlg_keyword)
 
         # change status
         self.status = "free"
