@@ -19,3 +19,4 @@ dictionary = "tao_top100K"
 NLG_operation = True
 description_path = "../dict/2022-06-16_update.txt"  # 使用文案字典的位置
 description_generation_threshold = 0.01  # 使用文案字典的機率，閥值設定約低越容易使用文案字典
+NLG_fill_up = True  # 如果SQL Search的文案數量不足，是否使用NLG的方式補足不夠的文案

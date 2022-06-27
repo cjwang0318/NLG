@@ -72,7 +72,8 @@ class web_server:
         # decode json
         content = request.json
         keyword = content['keyword']
-        nsamples = args.nsamples
+        nsamples = content['nsamples']
+        #nsamples = args.nsamples
 
         # generation level
         if args.segment:
@@ -124,7 +125,7 @@ class web_server:
             generate_type = "GPT2"
 
             # call GPT2 NLG Engine
-            gs.generator_rest(seg_keyword_without_oov, self.model, self.tokenizer)
+            gs.generator_rest(seg_keyword_without_oov, self.model, self.tokenizer, nsamples)
 
             # call postProcessing
             keyword_without_oov = seg_keyword_without_oov.replace(" ", "")

@@ -94,13 +94,21 @@ class web_server:
             else:
                 answer = {"keyword": str(keyword), "nsamples": str(nsamples), "samples": ["對不起～系統發生錯誤"]}
             # 如果SQL搜尋沒有找到文案，是否使用NLG模式生成文案
-            # results = None
-            if (args.NLG_operation and results == None):
+            num_results = len(results)
+            # if (args.NLG_operation and results == None):
+            if (args.NLG_operation and num_results < nsamples):
                 # 如果使用NLG模型，進入系統使用關鍵字為關鍵詞擷取後的結果，不是原本的完整的查詢詞
                 item_split = keyword_SQLquery_list[0].split("\t")
                 nlg_keyword = item_split[0]
-                answer = nc.call_nlg(nlg_keyword)
-
+                if args.NLG_fill_up:
+                    generate_type = "key_search+GPT"
+                    num_sample = nsamples - num_results
+                    nlg_results = nc.call_nlg_num_sample(nlg_keyword, num_sample)
+                    joined_results = results + nlg_results
+                    answer = {"keyword": str(nlg_keyword), "nsamples": str(nsamples), "samples": joined_results}
+                    ss.log_results(keyword, seg_keywords, nlg_keyword, joined_results, generate_type, category)
+                else:
+                    answer = nc.call_nlg(nlg_keyword)
         # change status
         self.status = "free"
         return answer

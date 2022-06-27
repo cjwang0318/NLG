@@ -125,7 +125,7 @@ def generate(n_ctx, model, context, length, tokenizer, temperature=1, top_k=0, t
                                repitition_penalty=repitition_penalty, device=device)
 
 
-def generator_rest(prefix, model, tokenizer):
+def generator_rest(prefix, model, tokenizer, nsamples):
     # if args.segment:
     #     from tokenizations import tokenization_bert_word_level as tokenization_bert
     # else:
@@ -134,7 +134,8 @@ def generator_rest(prefix, model, tokenizer):
     os.environ["CUDA_VISIBLE_DEVICES"] = args.device  # 此处设置程序使用哪些显卡
     length = args.length
     batch_size = args.batch_size
-    nsamples = args.nsamples
+    #nsamples = args.nsamples
+    nsamples = nsamples
     temperature = args.temperature
     topk = args.topk
     topp = args.topp
