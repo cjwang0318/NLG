@@ -47,6 +47,9 @@ class web_server:
         # decode json
         content = request.json
         keyword = content['keyword']
+        category = content['category']
+        # 通用類型 = 1
+        # 服飾類型 = 2
         nsamples = args.nsamples
         nkeywords = args.nkeywords
 
@@ -69,7 +72,7 @@ class web_server:
                     seg_keywords = keyword
                     sql_search_keyword = keyword
                     answer = {"keyword": str(sql_search_keyword), "nsamples": str(nsamples), "samples": results}
-                    ss.log_results(keyword, seg_keywords, sql_search_keyword, results, generate_type)
+                    ss.log_results(keyword, seg_keywords, sql_search_keyword, results, generate_type, category)
             elif (search_type == 'seg_search'):
                 seg_keywords, keyword_list = ss.generate_candidate_keyword_list(keyword)
                 sql_search_keyword, results = ss.get_seg_result(self.cursor, keyword_list, nsamples)
@@ -78,7 +81,7 @@ class web_server:
                 else:
                     generate_type = "seg_search"
                     answer = {"keyword": str(sql_search_keyword), "nsamples": str(nsamples), "samples": results}
-                    ss.log_results(keyword, seg_keywords, sql_search_keyword, results, generate_type)
+                    ss.log_results(keyword, seg_keywords, sql_search_keyword, results, generate_type, category)
             elif (search_type == 'key_search'):
                 seg_keywords, keyword_SQLquery_list = ss.generate_candidate_query_list(keyword, nkeywords)
                 sql_search_keyword, results = ss.get_keyword_result(self.cursor, keyword_SQLquery_list, nsamples)
@@ -87,7 +90,7 @@ class web_server:
                 else:
                     generate_type = "key_search"
                     answer = {"keyword": str(sql_search_keyword), "nsamples": str(nsamples), "samples": results}
-                    ss.log_results(keyword, seg_keywords, sql_search_keyword, results, generate_type)
+                    ss.log_results(keyword, seg_keywords, sql_search_keyword, results, generate_type, category)
             else:
                 answer = {"keyword": str(keyword), "nsamples": str(nsamples), "samples": ["對不起～系統發生錯誤"]}
             # 如果SQL搜尋沒有找到文案，是否使用NLG模式生成文案
