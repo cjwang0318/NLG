@@ -25,7 +25,8 @@ def dictionary_generation(path):
 
 
 if __name__ == '__main__':
-    path = "./vocab_desc_only_top100k.txt"
+    #path = "./vocab_desc_only_top100k.txt"
+    path = "./productName.txt"
     dictionary_generation(path)
 
     # keyword1 = "[SEP]"
