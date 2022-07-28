@@ -52,4 +52,5 @@ if __name__ == '__main__':
     # seg_query=call_CKIP(keyword)
     # print(seg_query)
     keyword = "日本抗菌兩用旋螺掏耳棒30524864"
+    keyword = "還活著嗎"
     call_nlg(keyword)
