@@ -42,6 +42,20 @@ def call_nlg(query):
     print('time: ', end - start)
     return outputs
 
+def call_slognan(query):
+    sendMessage_query = {
+        "keyword": query,
+    }
+    start = time.time()
+    # sent json to server
+    res = requests.post('http://192.168.50.32:5002/getResult', json=sendMessage_query)
+    if res.ok:
+        outputs = res.json()
+        print(outputs)
+
+    end = time.time()
+    print('time: ', end - start)
+    return outputs
 
 if __name__ == '__main__':
     keyword = "超級無敵馬甲西裝"
@@ -52,5 +66,6 @@ if __name__ == '__main__':
     # seg_query=call_CKIP(keyword)
     # print(seg_query)
     keyword = "日本抗菌兩用旋螺掏耳棒30524864"
-    keyword = "還活著嗎"
-    call_nlg(keyword)
+    keyword = "恰拉"
+    #call_nlg(keyword)
+    call_slognan(keyword)
