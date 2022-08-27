@@ -92,7 +92,9 @@ def query_construction_item_desc(keyword_list):
             tmp_item = tmp_item + str_item
             tmp_desc = tmp_desc + str_desc
         i = i + 1
-    return query + "(" + tmp_item + ") OR (" + tmp_desc + ")"
+    # OR_operation=query + "(" + tmp_item + ") OR (" + tmp_desc + ")"
+    AND_operation = query + "(" + tmp_item + ") AND (" + tmp_desc + ")"
+    return AND_operation
 
 
 def generate_candidate_query_list(keyword, nkeywords):
@@ -103,7 +105,7 @@ def generate_candidate_query_list(keyword, nkeywords):
     if num_keywords > nkeywords:
         keyword_list = cs.call_keyword_extraction(seg_keywords)
         # 如果關鍵詞擷取沒有作用，例如輸入『[還 活 著 嗎』，就使用沒有斷詞的keyword
-        if len(keyword_list)==0:
+        if len(keyword_list) == 0:
             keyword_list.append(keyword)
         # 將關鍵詞擷取後的結果加到seg_keywords
         seg_keywords = seg_keywords + "=>關鍵詞擷取結果[" + ', '.join(keyword_list) + "]"
@@ -143,13 +145,23 @@ def get_seg_result(cursor, keyword_list, topk):
 
 
 def get_keyword_result(cursor, keyword_list, topk):
+    # 若第1個SQL query搜尋數量不足，就會持續使用第2個SQL query，直到滿足搜尋數量為止
+    sql_search_keyword = ""
+    joined_results = []
     for item in keyword_list:
         item_split = item.split("\t")
         keyword = item_split[0]
         query = item_split[1]
         results = get_result(cursor, query, topk)
         if results != None:
-            return keyword, results
+            num_results = len(results)
+            sql_search_keyword = sql_search_keyword + keyword + "(" + str(num_results) + "),"
+            joined_results = joined_results + results
+            topk = topk - num_results
+            if topk == 0:
+                sql_search_keyword = sql_search_keyword[:-1]
+                list_shuffle(joined_results)
+                return sql_search_keyword, joined_results
     return keyword, results
 
 
@@ -188,12 +200,13 @@ if __name__ == '__main__':
     # print(ans)
 
     # keyword search testing
-    #seg_keywords, keyword_query = generate_candidate_query_list("樂活e棧-聖誕節MIT豪華加厚禦寒版-聖誕老人服裝(豪華5件套組)", 3)
-    #seg_keywords, keyword_query = generate_candidate_query_list("野生白蝦", 3)
-    seg_keywords, keyword_query = generate_candidate_query_list("還活著嗎", 3)
+    # seg_keywords, keyword_query = generate_candidate_query_list("樂活e棧-聖誕節MIT豪華加厚禦寒版-聖誕老人服裝(豪華5件套組)", 3)
+    # seg_keywords, keyword_query = generate_candidate_query_list("野生白蝦", 3)
+    # seg_keywords, keyword_query = generate_candidate_query_list("還活著嗎", 3)
+    seg_keywords, keyword_query = generate_candidate_query_list("貼身牛仔褲", 3)
     print(seg_keywords)
     print(keyword_query)
-    sql_search_keyword, results=get_keyword_result(cursor, keyword_query, 5)
+    sql_search_keyword, results = get_keyword_result(cursor, keyword_query, 5)
     print(sql_search_keyword)
     print(results)
     end = time.time()
